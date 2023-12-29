@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 var builder = WebApplication.CreateBuilder(args);
 
 
-// Add services to the container.
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddDbContext<EmployeeDbContext>(options =>
@@ -16,9 +16,9 @@ builder.Services.AddDbContext<EmployeeDbContext>(options =>
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<EmployeeDbContext>();
 
-builder.Logging.ClearProviders(); // removes all providers from LoggerFactory
-builder.Logging.AddConsole();
-builder.Logging.AddTraceSource("Information, ActivityTracing");
+
+
+builder.Services.AddRazorPages();
 
 
 var app = builder.Build();

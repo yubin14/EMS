@@ -1,35 +1,44 @@
 ﻿using EMS.Models;
 using EMS.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
 
 namespace EMS.Controllers
 {
+    [Authorize]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly ILogger<EmployeeController> _logger;
-        private readonly IWebHostEnvironment _webHostEnv;
-
-        public EmployeeController(IEmployeeRepository employeeRepository, ILogger<EmployeeController> logger, IWebHostEnvironment webHostEnv)
+        public EmployeeController(IEmployeeRepository employeeRepository, ILogger<EmployeeController> logger )
         {
             _employeeRepository = employeeRepository;
             _logger = logger;
-            _webHostEnv = webHostEnv;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
         {
             try
             {
-                
+   
+                int skip = (page - 1) * pageSize;
 
-                var employees = await _employeeRepository.GetAllEmployeesAsync();
-               
+                var employees = await _employeeRepository.GetAllEmployeesAsync(skip, pageSize);
+
+                var totalEmployees = await _employeeRepository.GetTotalEmployeesAsync();
+
+                var viewModel = new EmployeeListViewModel
+                {
+                    Employees = employees,
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalItems = totalEmployees
+                };
+
                 _logger.LogInformation("Retrieved all employees successfully.");
-                return View(employees);
+                return View(viewModel);
             }
             catch (Exception ex)
             {
@@ -62,14 +71,14 @@ namespace EMS.Controllers
 
                     _logger.LogInformation("Employee added successfully.");
 
-                    // Redirect to the Index action to show the updated list of employees.
+                    
                     return RedirectToAction("Index");
                 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding an employee.");
-                // Optionally, redirect or show an error view
+                
                 return RedirectToAction("Index");
             }
         }
@@ -110,7 +119,7 @@ namespace EMS.Controllers
                     employee.Email = model.Email;
                     employee.Department = model.Department;
 
-                    await _employeeRepository.UpdateEmployeeAsync(employee);
+                     await _employeeRepository.UpdateEmployeeAsync(employee);
 
                     _logger.LogInformation($"Employee {model.EmployeeID} updated successfully.");
 
@@ -123,7 +132,7 @@ namespace EMS.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An error occurred while updating employee with ID {model.EmployeeID}.");
-                // Optionally, redirect or show an error view
+               
                 return RedirectToAction("Index");
             }
         }
@@ -150,7 +159,7 @@ namespace EMS.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An error occurred while deleting employee with ID {model.EmployeeID}.");
-                // Optionally, redirect or show an error view
+                
                 return RedirectToAction("Index");
             }
         }
