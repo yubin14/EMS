@@ -7,21 +7,27 @@
 
 <style>
     body {
-        background-color: #f8f9fa; /* Light gray background color */
+        background-color: #f0f3f5; 
     }
 
     .card {
-        background-color: #ffffff; /* White card background color */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Box shadow for card */
+       
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+     
     }
 
+        .btn-login:hover {
+            background-color: #45a049; 
+            border-color: #45a049;
+        }
+
     .btn-primary {
-        background-color: #007bff; /* Primary button color */
+        background-color: #007bff; 
         border-color: #007bff;
     }
 
         .btn-primary:hover {
-            background-color: #0056b3; /* Darker color on hover */
+            background-color: #0056b3;
             border-color: #0056b3;
         }
 </style>
@@ -31,7 +37,7 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h2 class="text-center mb-4" style="color: #007bff;">@ViewData["Title"]</h2>
+                    <h2 class="text-center mb-4">@ViewData["Title"]</h2>
 
 
                     <form id="account" method="post">
@@ -39,62 +45,34 @@
 
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                            <label asp-for="Input.Email" style="color: #007bff;">Email</label>
+                            <label asp-for="Input.Email">Email</label>
                             <span asp-validation-for="Input.Email" class="text-danger"></span>
                         </div>
 
                         <div class="form-floating mb-3">
                             <input asp-for="Input.Password" type="password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                            <label asp-for="Input.Password" style="color: #007bff;">Password</label>
+                            <label asp-for="Input.Password">Password</label>
                             <span asp-validation-for="Input.Password" class="text-danger"></span>
                         </div>
 
                         <div class="form-check mb-3">
                             <input class="form-check-input" asp-for="Input.RememberMe" />
-                            <label class="form-check-label" asp-for="Input.RememberMe" style="color: #007bff;">Remember me</label>
+                            <label class="form-check-label" asp-for="Input.RememberMe" >Remember me</label>
                         </div>
 
-                        <button id="login-submit" type="submit" class="w-100 btn btn-primary">Log in</button>
+                        <button id="login-submit" type="submit" class="w-100 btn btn-primary" >Log in</button>
+
 
                         <div class="mt-3">
-                            <p>
-                                <a id="forgot-password" asp-page="./ForgotPassword" style="color: #007bff;">Forgot your password?</a>
-                            </p>
+                          
                             <p>
                                 <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" style="color: #007bff;">Register as a new user</a>
                             </p>
-                            <p>
-                                <a id="resend-confirmation" asp-page="./ResendEmailConfirmation" style="color: #007bff;">Resend email confirmation</a>
-                            </p>
+                           
                         </div>
                     </form>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="row justify-content-center mt-4">
-        <div class="col-md-6 text-center">
-            <h3 style="color: #007bff;">Use another service to log in</h3>
-            <hr />
-
-            @if ((Model.ExternalLogins?.Count ?? 0) == 0)
-            {
-                <p style="color: #333;">
-                    There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715" style="color: #007bff;">article about setting up this ASP.NET application to support logging in via external services</a>.
-                </p>
-            }
-            else
-            {
-                <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                    <div class="mb-3">
-                        @foreach (var provider in Model.ExternalLogins!)
-                        {
-                            <button type="submit" class="btn btn-outline-primary mx-2" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                        }
-                    </div>
-                </form>
-            }
         </div>
     </div>
 </div>

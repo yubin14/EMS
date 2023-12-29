@@ -20,10 +20,7 @@ namespace EMS.Repository
         {
             return await _dbContext.Employees.CountAsync();
         }
-        //public async Task<List<Employee>> GetAllEmployeesAsync()
-        //{
-        // return await _dbContext.Employees.ToListAsync();
-        //}
+        
         public async Task<Employee> GetEmployeeByIdAsync(int id)
         {
             return await _dbContext.Employees.FindAsync(id); 

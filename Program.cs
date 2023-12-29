@@ -1,13 +1,10 @@
 using EMS.Models;
 using EMS.Repository;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
@@ -16,10 +13,7 @@ builder.Services.AddDbContext<EmployeeDbContext>(options =>
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<EmployeeDbContext>();
 
-
-
 builder.Services.AddRazorPages();
-
 
 var app = builder.Build();
 
