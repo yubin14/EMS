@@ -1,11 +1,13 @@
 ﻿using EMS.Models;
 using EMS.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace EMS.Controllers
 {
+
     [Authorize]
     public class EmployeeController : Controller
     {
@@ -22,7 +24,7 @@ namespace EMS.Controllers
         {
             try
             {
-   
+  
                 int skip = (page - 1) * pageSize;
 
                 var employees = await _employeeRepository.GetAllEmployeesAsync(skip, pageSize);
