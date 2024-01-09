@@ -13,6 +13,7 @@ using static EMS.Areas.Identity.Pages.Account.LoginModel;
 
 namespace EMS.Controllers
 {
+   
     [Route("api/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]

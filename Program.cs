@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 var issuerSigningKey = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Keys")["TokenSigningKey"]);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddDbContext<EmployeeDbContext>(options =>
    options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")));

@@ -1,8 +1,10 @@
-﻿namespace EMS.Models
+﻿
+
+namespace EMS.Models
 {
     public class EmployeeListViewModel : IEnumerable<Employee>
     {
-        public List<Employee> Employees { get; set; }
+        public required List<Employee> Employees { get; set; } 
         public int CurrentPage { get; set; }
         public int PageSize { get; set; }
         public int TotalItems { get; set; }

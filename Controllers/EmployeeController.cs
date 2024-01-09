@@ -1,53 +1,33 @@
-﻿using EMS.Models;
+﻿using EMS.Models.Query;
+using EMS.Models.Command;
 using EMS.Repository;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using EMS.Models;
 
 namespace EMS.Controllers
 {
-
     [Authorize]
     public class EmployeeController : Controller
     {
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IMediator _mediator;
         private readonly ILogger<EmployeeController> _logger;
-        public EmployeeController(IEmployeeRepository employeeRepository, ILogger<EmployeeController> logger )
+
+        public EmployeeController(IMediator mediator, ILogger<EmployeeController> logger)
         {
-            _employeeRepository = employeeRepository;
+            _mediator = mediator;
             _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
         {
-            try
-            {
-  
-                int skip = (page - 1) * pageSize;
+            var query = new GetEmployeesQuery { Page = page, PageSize = pageSize };
+            var employeeList = await _mediator.Send(query);
 
-                var employees = await _employeeRepository.GetAllEmployeesAsync(skip, pageSize);
-
-                var totalEmployees = await _employeeRepository.GetTotalEmployeesAsync();
-
-                var viewModel = new EmployeeListViewModel
-                {
-                    Employees = employees,
-                    CurrentPage = page,
-                    PageSize = pageSize,
-                    TotalItems = totalEmployees
-                };
-
-                _logger.LogInformation("Retrieved all employees successfully.");
-                return View(viewModel);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while getting employees.");
-                
-                return RedirectToAction("Index");
-            }
+            return View(employeeList);
         }
 
         [HttpGet]
@@ -57,30 +37,17 @@ namespace EMS.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(AddEmployeeViewModel addEmployeeRequest)
+        public async Task<IActionResult> Add(AddEmployeeCommand command)
         {
             try
             {
-                    var employee = new Employee()
-                    {
-                        FirstName = addEmployeeRequest.FirstName,
-                        LastName = addEmployeeRequest.LastName,
-                        Email = addEmployeeRequest.Email,
-                        Department = addEmployeeRequest.Department,
-                    };
+                var employeeId = await _mediator.Send(command);
 
-                    await _employeeRepository.AddEmployeeAsync(employee);
-
-                    _logger.LogInformation("Employee added successfully.");
-
-                    
-                    return RedirectToAction("Index");
-                
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding an employee.");
-                
                 return RedirectToAction("Index");
             }
         }
@@ -88,11 +55,12 @@ namespace EMS.Controllers
         [HttpGet]
         public async Task<IActionResult> View(int id)
         {
-            var employee = await _employeeRepository.GetEmployeeByIdAsync(id);
+            var query = new GetEmployeeByIdQuery { EmployeeID = id };
+            var employee = await _mediator.Send(query);
 
             if (employee != null)
             {
-                var viewModel = new UpdateEmployeeViewModel()
+                var command = new UpdateEmployeeCommand
                 {
                     EmployeeID = employee.EmployeeID,
                     FirstName = employee.FirstName,
@@ -101,70 +69,42 @@ namespace EMS.Controllers
                     Department = employee.Department,
                 };
 
-                return View("View", viewModel);
+                return View("View", command);
             }
 
             return RedirectToAction("Index");
         }
 
         [HttpPost]
-        public async Task<IActionResult> View(UpdateEmployeeViewModel model)
+        public async Task<IActionResult> View(UpdateEmployeeCommand command)
         {
             try
             {
-                var employee = await _employeeRepository.GetEmployeeByIdAsync(model.EmployeeID);
+                await _mediator.Send(command);
 
-                if (employee != null)
-                {
-                    employee.FirstName = model.FirstName;
-                    employee.LastName = model.LastName;
-                    employee.Email = model.Email;
-                    employee.Department = model.Department;
-
-                     await _employeeRepository.UpdateEmployeeAsync(employee);
-
-                    _logger.LogInformation($"Employee {model.EmployeeID} updated successfully.");
-
-                    return RedirectToAction("Index");
-                }
-
-                _logger.LogWarning($"Attempted to update non-existent employee with ID {model.EmployeeID}.");
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error occurred while updating employee with ID {model.EmployeeID}.");
-               
+                _logger.LogError(ex, $"An error occurred while updating employee with ID {command.EmployeeID}.");
                 return RedirectToAction("Index");
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(UpdateEmployeeViewModel model)
+        public async Task<IActionResult> Delete(DeleteEmployeeCommand command)
         {
             try
             {
-                var employee = await _employeeRepository.GetEmployeeByIdAsync(model.EmployeeID);
+                await _mediator.Send(command);
 
-                if (employee != null)
-                {
-                    await _employeeRepository.DeleteEmployeeAsync(model.EmployeeID);
-
-                    _logger.LogInformation($"Employee {model.EmployeeID} deleted successfully.");
-
-                    return RedirectToAction("Index");
-                }
-
-                _logger.LogWarning($"Attempted to delete non-existent employee with ID {model.EmployeeID}.");
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"An error occurred while deleting employee with ID {model.EmployeeID}.");
-                
+                _logger.LogError(ex, $"An error occurred while deleting employee with ID {command.EmployeeID}.");
                 return RedirectToAction("Index");
             }
         }
     }
-
 }
